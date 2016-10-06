@@ -1,0 +1,33 @@
+server:
+  port: 9098
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/   #Local Configuration
+#      defaultZone: http://172.17.0.1:8761/eureka/  #172.17.0.1 is docker ip
+#      defaultZone: http://eureka2:8762/eureka/,http://eureka:8761/eureka/ #Docker configuration by compose name
+#      defaultZone: http://172.16.8.35:8761/eureka/ #Eureka @ remote server
+#      defaultZone: http://reg-server:8761/eureka/
+    healthcheck:
+      enabled: true
+
+  instance:
+    lease-renewal-interval-in-seconds: 5
+    instance-id: ${spring.application.name}:${random.value}
+#    metadata-map:
+#      instanceId: ${spring.application.name}:${spring.application.instance_id:${server.port}}
+#    prefer-ip-address: true                             #Comment when want to test in local
+#    ip-address: 172.16.8.35                             # ip gitlab. Comment when want to test in local
+
+
+
+spring:
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: jdbc:oracle:thin:@172.16.8.160:1521:rtsngdev
+    username: artsdev
+    password: artsdev
+
+logging:
+  file: /usr/logging/transaction.log

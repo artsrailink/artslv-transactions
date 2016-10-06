@@ -1,0 +1,7 @@
+maven_image:
+  script:
+    - /usr/local/maven/bin/mvn clean package
+  tags:
+    - rtsng-lv
+
+
