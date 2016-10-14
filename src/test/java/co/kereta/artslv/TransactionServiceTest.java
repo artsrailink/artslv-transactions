@@ -1,7 +1,7 @@
 package co.kereta.artslv;
 
 import co.id.artslv.lib.PageImplBean;
-import co.id.artslv.lib.response.MessageWrapper;
+import co.id.artslv.lib.responses.MessageWrapper;
 import co.id.artslv.lib.transactions.Transaction;
 import co.id.artslv.lib.transactions.Transactiondet;
 import org.junit.Test;

@@ -1,6 +1,6 @@
 package co.id.artslv.service;
 
-import co.id.artslv.lib.response.MessageWrapper;
+import co.id.artslv.lib.responses.MessageWrapper;
 import co.id.artslv.lib.transactions.Transaction;
 import co.id.artslv.lib.transactions.Transactiondet;
 import co.id.artslv.lib.utility.CustomErrorResponse;
