@@ -42,7 +42,12 @@ public class TransactionService {
             throw new CustomException(new CustomErrorResponse("10","No Transaction Available"));
         }
         List<Transactiondet> avaTransactiondets = transactiondetRepository.findByTransactionid(transactionid);
-        MessageWrapper<Object> resultWrapper = new MessageWrapper<>("00","SUCCESS",availableTransaction,avaTransactiondets);
+        MessageWrapper<Object> resultWrapper = null;
+        if(avaTransactiondets!=null && !avaTransactiondets.isEmpty()){
+            resultWrapper = new MessageWrapper<>("00","SUCCESS",availableTransaction,avaTransactiondets);
+        }else{
+            resultWrapper = new MessageWrapper<>("00","SUCCESS",availableTransaction);
+        }
         return resultWrapper;
     }
 
