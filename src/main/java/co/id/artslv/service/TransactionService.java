@@ -27,7 +27,7 @@ public class TransactionService {
     @Transactional(rollbackFor = CustomException.class)
     public MessageWrapper<List<Transaction>> getAllTransaction() throws CustomException {
         List<Transaction> transactions = transactionRepository.findAll();
-        if(transactions==null){
+        if(transactions==null || transactions.isEmpty()){
             throw new CustomException(new CustomErrorResponse("10","No Transaction Available"));
         }
         MessageWrapper<List<Transaction>> messageWrapper = new MessageWrapper<>("00","SUCCESS",transactions);
@@ -41,7 +41,7 @@ public class TransactionService {
         if(availableTransaction==null){
             throw new CustomException(new CustomErrorResponse("10","No Transaction Available"));
         }
-        List<Transactiondet> avaTransactiondets = transactiondetRepository.findByTransactionId(transactionid);
+        List<Transactiondet> avaTransactiondets = transactiondetRepository.findByTransactionid(transactionid);
         MessageWrapper<Object> resultWrapper = new MessageWrapper<>("00","SUCCESS",availableTransaction,avaTransactiondets);
         return resultWrapper;
     }

@@ -7,7 +7,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableDiscoveryClient
+//@EnableDiscoveryClient
 @EnableJpaRepositories(basePackages = "co.id.artslv.repository")
 @EntityScan(basePackages = "co.id.artslv.lib")
 public class TransactionServiceApplication {
