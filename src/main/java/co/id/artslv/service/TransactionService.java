@@ -41,7 +41,7 @@ public class TransactionService {
         if(availableTransaction==null){
             throw new CustomException(new CustomErrorResponse("10","No Transaction Available"));
         }
-        List<Transactiondet> avaTransactiondets = transactiondetRepository.findById(transactionid);
+        List<Transactiondet> avaTransactiondets = transactiondetRepository.findByTransactionId(transactionid);
         MessageWrapper<Object> resultWrapper = new MessageWrapper<>("00","SUCCESS",availableTransaction,avaTransactiondets);
         return resultWrapper;
     }

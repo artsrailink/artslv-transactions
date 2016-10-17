@@ -11,6 +11,6 @@ import java.util.List;
  * Created by root on 03/10/16.
  */
 public interface TransactiondetRepository extends JpaRepository<Transactiondet,String>{
-    List<Transactiondet> findById(String transactionid);
+    List<Transactiondet> findByTransactionId(String transactionid);
     Page<Transactiondet> findAll(Pageable pageable);
 }
