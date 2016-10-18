@@ -34,7 +34,9 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/ARTSDEV
     username: root
-    password: root
+    password: admin
 
-logging:
-  file: /usr/logging/transaction.log
+#logging:
+#  file: /usr/logging/transaction.log
+spring.jpa:
+  show-sql: true
