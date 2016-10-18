@@ -33,7 +33,8 @@ public class TransactiondetService {
         Page<Transactiondet> pageTransactiondet = transactiondetRepository.findAll(pageable);
         String pageStringResult = objectMapper.writeValueAsString(pageTransactiondet);
         PageImplBean<Transactiondet> pageImplBeanTransdet = objectMapper.readValue(pageStringResult, new TypeReference<PageImplBean<Transaction>>() {});
-        if(pageImplBeanTransdet==null){
+        
+        if(pageImplBeanTransdet==null || pageImplBeanTransdet.getContent().isEmpty()){
             throw new CustomException(new CustomErrorResponse("10","Cannot Find Transaction detail"));
         }
         return new MessageWrapper<>("00","SUCCESS",pageImplBeanTransdet);

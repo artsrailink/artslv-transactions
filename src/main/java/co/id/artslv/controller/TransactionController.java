@@ -8,11 +8,9 @@ import co.id.artslv.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -27,7 +25,6 @@ public class TransactionController {
 
     @RequestMapping(value = "/getall",method = RequestMethod.GET)
     public ResponseEntity<?> getAllTransactions(){
-
         try {
             MessageWrapper<List<Transaction>> transactionWrapper = transactionService.getAllTransaction();
             return new ResponseEntity<>(transactionWrapper, HttpStatus.OK);
@@ -42,6 +39,18 @@ public class TransactionController {
     public ResponseEntity<?> getTransactionDetails(@RequestBody Transaction transaction){
         try {
             MessageWrapper<Object> resultWrapper = transactionService.getTransactionDetails(transaction);
+            return new ResponseEntity<>(resultWrapper,HttpStatus.OK);
+        } catch (CustomException e) {
+            CustomErrorResponse customErrorResponse = (CustomErrorResponse)e.getCause();
+            MessageWrapper<?> transactionError = new MessageWrapper<>(customErrorResponse);
+            return new ResponseEntity<Object>(transactionError,HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(value = "/bookinfo/{rqid}",method = RequestMethod.POST)
+    public ResponseEntity<?> getBookInfo(@RequestBody Transaction transaction, @PathVariable String rqid) throws IOException {
+        try {
+            MessageWrapper<Object> resultWrapper = transactionService.getBookInfo(transaction, rqid);
             return new ResponseEntity<>(resultWrapper,HttpStatus.OK);
         } catch (CustomException e) {
             CustomErrorResponse customErrorResponse = (CustomErrorResponse)e.getCause();
