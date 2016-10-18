@@ -1,6 +1,7 @@
 package co.id.artslv.controller;
 
 import co.id.artslv.lib.responses.MessageWrapper;
+import co.id.artslv.lib.transactions.Bookingdata;
 import co.id.artslv.lib.transactions.Transaction;
 import co.id.artslv.lib.utility.CustomErrorResponse;
 import co.id.artslv.lib.utility.CustomException;
@@ -49,4 +50,16 @@ public class TransactionController {
             return new ResponseEntity<Object>(transactionError,HttpStatus.OK);
         }
     }
+    
+    @RequestMapping(value = "/booking",method = RequestMethod.POST)
+    public ResponseEntity<?> setBooking(@RequestBody Bookingdata bookingdata){
+        try {
+            MessageWrapper<Bookingdata> resultWrapper = transactionService.setBooking(bookingdata);
+            return new ResponseEntity<>(resultWrapper,HttpStatus.OK);
+        } catch (CustomException e) {
+            CustomErrorResponse customErrorResponse = (CustomErrorResponse)e.getCause();
+            MessageWrapper<?> transactionError = new MessageWrapper<>(customErrorResponse);
+            return new ResponseEntity<Object>(transactionError,HttpStatus.OK);
+        }
+    }    
 }
