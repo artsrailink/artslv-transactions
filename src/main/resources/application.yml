@@ -32,9 +32,9 @@ spring:
 
 #  mysql
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/ARTSDEV
-    username: root
-    password: root
+    url: jdbc:mysql://artsdev.clpcb7xlzus1.us-east-1.rds.amazonaws.com:3306/ARTSDEV
+    username: ARTSDEV
+    password: ARTSDEVGP
 
-logging:
-  file: /usr/logging/transaction.log
+#logging:
+#  file: /usr/logging/transaction.log
