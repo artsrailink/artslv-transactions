@@ -14,5 +14,7 @@ public interface TransactionRepository extends JpaRepository<Transaction,String>
 
     @Query(value = "select arts_f_createbookcode() ", nativeQuery = true)
     String getBookCode();
+    @Query(value = "select arts_f_createpaycode() ", nativeQuery = true)
+    String getPayCode();    
 
 }
