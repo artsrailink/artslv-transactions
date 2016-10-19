@@ -46,6 +46,7 @@ public class DefaultSeatService {
 
         List<Inventory> availableSeats = new ArrayList<>();
         benchmarkOriginInventory.forEach(inventory -> {
+
             Inventory availableSeat = new Inventory();
             availableSeat.setStatus(inventory.getStatus());
             availableSeat.setBookstat(inventory.getBookstat());
@@ -56,7 +57,7 @@ public class DefaultSeatService {
             availableSeat.setWagondetrow(inventory.getWagondetrow());
             availableSeat.setStamformdetcode(inventory.getStamformdetcode());
             availableSeat.setStamformdetid(inventory.getStamformdetid());
-
+            availableSeat.setId(inventory.getId());
             availableSeats.add(availableSeat);
         });
 
