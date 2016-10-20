@@ -45,7 +45,7 @@ public class TransactionController {
         }
     }
 
-    @RequestMapping(value = "/arts_bookinfo/{rqid}", method = RequestMethod.POST)
+    @RequestMapping(value = "/arts_getbookinfo/{rqid}", method = RequestMethod.POST)
     public ResponseEntity<?> getBookInfo(@RequestBody Transaction transaction, @PathVariable String rqid) throws IOException {
         try {
             MessageWrapper<Object> resultWrapper = transactionService.getBookInfo(transaction, rqid);
