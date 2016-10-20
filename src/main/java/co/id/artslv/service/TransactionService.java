@@ -82,34 +82,33 @@ public class TransactionService {
     }
 
     @Transactional(rollbackFor = CustomException.class)
-    public MessageWrapper<Object> getBookInfo(Transaction transaction, String rqid) throws CustomException, IOException {
-
-        String bookcode = transaction.getBookcode();
-        String paycode = transaction.getPaycode();
-
+    public MessageWrapper<Object> getBookInfo(String rqid, String paramcode) throws CustomException, IOException {
         User user = userRepository.findByRqid(rqid);
         if (user == null) {
             throw new CustomException(new CustomErrorResponse("01", "RQID is not valid"));
         }
 
+        if (paramcode == null || paramcode.equals("")) {
+            throw new CustomException(new CustomErrorResponse("02", "Paycode or Bookcode must be filled"));
+        }
+
         Transaction availableTransaction;
-        if ((bookcode != null) && ((paycode == null) || (paycode.isEmpty()))) {
-            availableTransaction = transactionRepository.findByBookcodeIgnoreCase(bookcode);
-        } else if (((bookcode == null) || (bookcode.isEmpty())) && (paycode != null)) {
-            availableTransaction = transactionRepository.findByPaycodeIgnoreCase(paycode);
-        } else if ((bookcode != null) && (paycode != null)) {
-            availableTransaction = transactionRepository.findByBookcodeIgnoreCaseAndPaycodeIgnoreCase(bookcode, paycode);
+
+        if (paramcode.length() == 13) {//paycode
+            availableTransaction = transactionRepository.findByPaycodeIgnoreCase(paramcode);
+        } else if (paramcode.length() == 7) { //bookcode
+            availableTransaction = transactionRepository.findByBookcodeIgnoreCase(paramcode);
         } else {
-            throw new CustomException(new CustomErrorResponse("10", "No Transaction Available"));
+            throw new CustomException(new CustomErrorResponse("04", "Transaction not found"));
         }
 
         if (availableTransaction == null) {
-            throw new CustomException(new CustomErrorResponse("10", "No Transaction Available"));
+            throw new CustomException(new CustomErrorResponse("04", "Transaction not found"));
         }
 
         List<Transactiondet> avaTransactiondets = transactiondetRepository.findByTransactionid(availableTransaction.getId());
         if (avaTransactiondets == null || avaTransactiondets.isEmpty()) {
-            throw new CustomException(new CustomErrorResponse("10", "No Transactiondet Available"));
+            throw new CustomException(new CustomErrorResponse("04", "No Transaction Detail not found"));
         }
         Bookingdata bookingdata = new Bookingdata();
         bookingdata.setBookcode(availableTransaction.getBookcode());
@@ -336,6 +335,8 @@ public class TransactionService {
             inventory.setBookstat("1");
             inventory.setBookcode(savetrans.getBookcode());
             inventory.setTransactiondetorder(order);
+            inventory.setSubclassid(savetransdet.getSubclassid());
+            inventory.setSubclasscode(savetransdet.getSubclasscode());
             inventoryRepository.save(inventory);
             order++;
         }
@@ -360,13 +361,14 @@ public class TransactionService {
         result.setTotamount(savetrans.getTotamount());
         result.setNetamount(savetrans.getNetamount());
         result.setExtrafee(savetrans.getExtrafee());
+        result.setSubclass(savetrans.getSubclasscode());
         result.setPaxlist(newpaxlist);
 
         MessageWrapper<Bookingdata> messageWrapper = new MessageWrapper<>("00", "SUCCESS", result);
         return messageWrapper;
     }
 
-    public MessageWrapper<Bookingdata> setBookingv2(Bookingdata bookingdata,String rqid) throws CustomException {
+    public MessageWrapper<Bookingdata> setBookingv2(Bookingdata bookingdata, String rqid) throws CustomException {
         User user = userRepository.findByRqid(rqid);
         if (user == null) {
             throw new CustomException(new CustomErrorResponse("01", "RQID is not valid"));
@@ -530,6 +532,8 @@ public class TransactionService {
             inventory.setBookstat("1");
             inventory.setBookcode(savetrans.getBookcode());
             inventory.setTransactiondetorder(order);
+            inventory.setSubclassid(savetransdet.getSubclassid());
+            inventory.setSubclasscode(savetransdet.getSubclasscode());
             inventoryRepository.save(inventory);
             order++;
         }
@@ -554,6 +558,7 @@ public class TransactionService {
         result.setTotamount(savetrans.getTotamount());
         result.setNetamount(savetrans.getNetamount());
         result.setExtrafee(savetrans.getExtrafee());
+        result.setSubclass(savetrans.getSubclasscode());
         result.setPaxlist(newpaxlist);
 
         MessageWrapper<Bookingdata> messageWrapper = new MessageWrapper<>("00", "SUCCESS", result);

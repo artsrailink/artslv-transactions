@@ -45,15 +45,15 @@ public class TransactionController {
         }
     }
 
-    @RequestMapping(value = "/arts_getbookinfo/{rqid}", method = RequestMethod.POST)
-    public ResponseEntity<?> getBookInfo(@RequestBody Transaction transaction, @PathVariable String rqid) throws IOException {
+    @RequestMapping(value = "/arts_getbookinfo/{rqid}/{paramcode}", method = RequestMethod.GET)
+    public ResponseEntity<?> getBookInfo(@PathVariable String rqid, @PathVariable String paramcode) throws IOException {
         try {
-            MessageWrapper<Object> resultWrapper = transactionService.getBookInfo(transaction, rqid);
+            MessageWrapper<Object> resultWrapper = transactionService.getBookInfo(rqid, paramcode);
             return new ResponseEntity<>(resultWrapper, HttpStatus.OK);
         } catch (CustomException e) {
             CustomErrorResponse customErrorResponse = (CustomErrorResponse) e.getCause();
             MessageWrapper<?> transactionError = new MessageWrapper<>(customErrorResponse);
-            return new ResponseEntity<Object>(transactionError, HttpStatus.OK);
+            return new ResponseEntity<Object>(transactionError, HttpStatus.ACCEPTED);
         }
     }
 
