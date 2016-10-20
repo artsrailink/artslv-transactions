@@ -82,23 +82,17 @@ public class TransactionService {
     }
 
     @Transactional(rollbackFor = CustomException.class)
-    public MessageWrapper<Object> getBookInfo(Transaction transaction, String rqid) throws CustomException, IOException {
-
-        String bookcode = transaction.getBookcode();
-        String paycode = transaction.getPaycode();
-
+    public MessageWrapper<Object> getBookInfo(String rqid, String paramcode) throws CustomException, IOException {
         User user = userRepository.findByRqid(rqid);
         if (user == null) {
             throw new CustomException(new CustomErrorResponse("01", "RQID is not valid"));
         }
 
         Transaction availableTransaction;
-        if ((bookcode != null) && ((paycode == null) || (paycode.isEmpty()))) {
-            availableTransaction = transactionRepository.findByBookcodeIgnoreCase(bookcode);
-        } else if (((bookcode == null) || (bookcode.isEmpty())) && (paycode != null)) {
-            availableTransaction = transactionRepository.findByPaycodeIgnoreCase(paycode);
-        } else if ((bookcode != null) && (paycode != null)) {
-            availableTransaction = transactionRepository.findByBookcodeIgnoreCaseAndPaycodeIgnoreCase(bookcode, paycode);
+        if (paramcode.length() == 13) {//paycode
+            availableTransaction = transactionRepository.findByPaycodeIgnoreCase(paramcode);
+        } else if (paramcode.length() == 7) { //bookcode
+            availableTransaction = transactionRepository.findByBookcodeIgnoreCase(paramcode);
         } else {
             throw new CustomException(new CustomErrorResponse("10", "No Transaction Available"));
         }
