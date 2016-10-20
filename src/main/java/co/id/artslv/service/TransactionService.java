@@ -336,6 +336,8 @@ public class TransactionService {
             inventory.setBookstat("1");
             inventory.setBookcode(savetrans.getBookcode());
             inventory.setTransactiondetorder(order);
+            inventory.setSubclassid(savetransdet.getSubclassid());
+            inventory.setSubclasscode(savetransdet.getSubclasscode());
             inventoryRepository.save(inventory);
             order++;
         }
@@ -360,13 +362,14 @@ public class TransactionService {
         result.setTotamount(savetrans.getTotamount());
         result.setNetamount(savetrans.getNetamount());
         result.setExtrafee(savetrans.getExtrafee());
+        result.setSubclass(savetrans.getSubclasscode());
         result.setPaxlist(newpaxlist);
 
         MessageWrapper<Bookingdata> messageWrapper = new MessageWrapper<>("00", "SUCCESS", result);
         return messageWrapper;
     }
 
-    public MessageWrapper<Bookingdata> setBookingv2(Bookingdata bookingdata,String rqid) throws CustomException {
+    public MessageWrapper<Bookingdata> setBookingv2(Bookingdata bookingdata, String rqid) throws CustomException {
         User user = userRepository.findByRqid(rqid);
         if (user == null) {
             throw new CustomException(new CustomErrorResponse("01", "RQID is not valid"));
@@ -530,6 +533,8 @@ public class TransactionService {
             inventory.setBookstat("1");
             inventory.setBookcode(savetrans.getBookcode());
             inventory.setTransactiondetorder(order);
+            inventory.setSubclassid(savetransdet.getSubclassid());
+            inventory.setSubclasscode(savetransdet.getSubclasscode());
             inventoryRepository.save(inventory);
             order++;
         }
@@ -554,6 +559,7 @@ public class TransactionService {
         result.setTotamount(savetrans.getTotamount());
         result.setNetamount(savetrans.getNetamount());
         result.setExtrafee(savetrans.getExtrafee());
+        result.setSubclass(savetrans.getSubclasscode());
         result.setPaxlist(newpaxlist);
 
         MessageWrapper<Bookingdata> messageWrapper = new MessageWrapper<>("00", "SUCCESS", result);
