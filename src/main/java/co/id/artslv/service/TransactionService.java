@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 @Service
 public class TransactionService {
 
-    private static final String scheduleBaseUrl = "https://arts-schedule.herokuapp.com/schedule/getschedule/";
+    private static final String scheduleBaseUrl = "https://arts-schedule.herokuapp.com/schedule/arts_getschedule/";
 
     @Autowired
     private TransactionRepository transactionRepository;
