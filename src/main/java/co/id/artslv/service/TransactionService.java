@@ -88,22 +88,27 @@ public class TransactionService {
             throw new CustomException(new CustomErrorResponse("01", "RQID is not valid"));
         }
 
+        if (paramcode == null || paramcode.equals("")) {
+            throw new CustomException(new CustomErrorResponse("02", "Paycode or Bookcode must be filled"));
+        }
+
         Transaction availableTransaction;
+
         if (paramcode.length() == 13) {//paycode
             availableTransaction = transactionRepository.findByPaycodeIgnoreCase(paramcode);
         } else if (paramcode.length() == 7) { //bookcode
             availableTransaction = transactionRepository.findByBookcodeIgnoreCase(paramcode);
         } else {
-            throw new CustomException(new CustomErrorResponse("10", "No Transaction Available"));
+            throw new CustomException(new CustomErrorResponse("04", "Transaction not found"));
         }
 
         if (availableTransaction == null) {
-            throw new CustomException(new CustomErrorResponse("10", "No Transaction Available"));
+            throw new CustomException(new CustomErrorResponse("04", "Transaction not found"));
         }
 
         List<Transactiondet> avaTransactiondets = transactiondetRepository.findByTransactionid(availableTransaction.getId());
         if (avaTransactiondets == null || avaTransactiondets.isEmpty()) {
-            throw new CustomException(new CustomErrorResponse("10", "No Transactiondet Available"));
+            throw new CustomException(new CustomErrorResponse("04", "No Transaction Detail not found"));
         }
         Bookingdata bookingdata = new Bookingdata();
         bookingdata.setBookcode(availableTransaction.getBookcode());

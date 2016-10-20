@@ -53,7 +53,7 @@ public class TransactionController {
         } catch (CustomException e) {
             CustomErrorResponse customErrorResponse = (CustomErrorResponse) e.getCause();
             MessageWrapper<?> transactionError = new MessageWrapper<>(customErrorResponse);
-            return new ResponseEntity<Object>(transactionError, HttpStatus.OK);
+            return new ResponseEntity<Object>(transactionError, HttpStatus.ACCEPTED);
         }
     }
 
