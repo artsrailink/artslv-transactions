@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -17,6 +20,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class DefaultSeatService {
+
+    private static final ExecutorService executorService = Executors.newFixedThreadPool(2);
+
     @Autowired
     private InventoryRepository inventoryRepository;
 
@@ -72,6 +78,15 @@ public class DefaultSeatService {
         });
 
         List<Inventory> nSeat = availableBasedOnNoka.stream().limit(noOfPassanger).collect(Collectors.toList());
+        CompletableFuture.supplyAsync(()->{
+            List<Inventory> savedData = nSeat.stream().map(inventory -> {
+                String id = inventory.getId();
+                Inventory invent = inventoryRepository.findById(id);
+                return invent;
+            }).collect(Collectors.toList());
+
+            return inventoryRepository.save(savedData);
+        },executorService);
 
         return nSeat;
     }

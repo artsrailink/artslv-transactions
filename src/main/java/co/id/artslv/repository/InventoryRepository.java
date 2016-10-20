@@ -12,4 +12,5 @@ import java.util.List;
 public interface InventoryRepository extends JpaRepository<Inventory,String>{
     List<Inventory> findByBookstatAndTripdateAndStoporderBetween(String bookstat, LocalDate tripdate, int org, int dest);
     List<Inventory> findByBookstatAndTripdateAndStoporder(String bookstat,LocalDate tripdate, int org);
+    Inventory findById(String id);
 }
