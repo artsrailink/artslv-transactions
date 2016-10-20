@@ -173,7 +173,11 @@ public class TransactionService {
         return resultWrapper;
     }
 
-    public MessageWrapper<Bookingdata> setBooking(Bookingdata bookingdata) throws CustomException {
+    public MessageWrapper<Bookingdata> setBooking(Bookingdata bookingdata, String rqid) throws CustomException {
+        User user = userRepository.findByRqid(rqid);
+        if (user == null) {
+            throw new CustomException(new CustomErrorResponse("01", "RQID is not valid"));
+        }
         List<Pax> paxlist = bookingdata.getPaxlist();
         if (paxlist == null) {
             throw new CustomException(new CustomErrorResponse("10", "No Pax"));
@@ -190,7 +194,7 @@ public class TransactionService {
         Transaction newtrans = new Transaction();
         newtrans.setBookcode(transactionRepository.getBookCode());
         newtrans.setPaycode(transactionRepository.getPayCode());
-        newtrans.setTransdate(bookingdata.getTransdatetime());        
+        newtrans.setTransdate(bookingdata.getTransdatetime());
         newtrans.setTotamount(bookingdata.getTotamount());
         newtrans.setExtrafee(bookingdata.getExtrafee());
         newtrans.setNetamount(bookingdata.getNetamount());
@@ -288,12 +292,12 @@ public class TransactionService {
             newtransdet.setTransactionflexiredeemstat("0");
             newtransdet.setPsgname(pax.getName());
             newtransdet.setPsgid(pax.getIdnum());
-            newtransdet.setStamformdetid(inventorylist.get(order-1).getStamformdetid());
-            newtransdet.setStamformdetcode(inventorylist.get(order-1).getStamformdetcode());
-            newtransdet.setWagondetid(inventorylist.get(order-1).getWagondetid());
-            newtransdet.setWagondetrow(inventorylist.get(order-1).getWagondetrow());
-            newtransdet.setWagondetcol(inventorylist.get(order-1).getWagondetcol());
-            newtransdet.setAmount(pax.getAmount());            
+            newtransdet.setStamformdetid(inventorylist.get(order - 1).getStamformdetid());
+            newtransdet.setStamformdetcode(inventorylist.get(order - 1).getStamformdetcode());
+            newtransdet.setWagondetid(inventorylist.get(order - 1).getWagondetid());
+            newtransdet.setWagondetrow(inventorylist.get(order - 1).getWagondetrow());
+            newtransdet.setWagondetcol(inventorylist.get(order - 1).getWagondetcol());
+            newtransdet.setAmount(pax.getAmount());
             newtransdet.setTicketnum("DUMMYTICKETNUM-" + order);
             newtransdet.setFareid(propscheduleMap.get(bookingdata.getPropscheduleid()).getFareid());
             newtransdet.setFarebasicfare(fareMap.get(newtransdet.getFareid()).getBasicfare());
@@ -313,7 +317,7 @@ public class TransactionService {
             newtransdet.setCreatedby("userpos");
             newtransdet.setCreatedon(LocalDateTime.now());
             newtransdet.setModifiedby("userpos");
-            newtransdet.setModifiedon(LocalDateTime.now());            
+            newtransdet.setModifiedon(LocalDateTime.now());
             newtransdet.setOrder(order);
             newtransdet.setReleasestat("0");
             Transactiondet savetransdet = transactiondetRepository.save(newtransdet);
@@ -325,14 +329,14 @@ public class TransactionService {
             pax.setWagondetcol(newtransdet.getWagondetcol());
             newpaxlist.add(pax);
 
-            Inventory inventory = inventoryRepository.findOne(inventorylist.get(order-1).getId());
+            Inventory inventory = inventoryRepository.findOne(inventorylist.get(order - 1).getId());
             if (inventory == null) {
                 throw new CustomException(new CustomErrorResponse("10", "Seat Not Found"));
             }
             inventory.setBookstat("1");
             inventory.setBookcode(savetrans.getBookcode());
             inventory.setTransactiondetorder(order);
-            inventoryRepository.save(inventory);   
+            inventoryRepository.save(inventory);
             order++;
         }
 
@@ -361,8 +365,12 @@ public class TransactionService {
         MessageWrapper<Bookingdata> messageWrapper = new MessageWrapper<>("00", "SUCCESS", result);
         return messageWrapper;
     }
-    
-    public MessageWrapper<Bookingdata> setBookingv2(Bookingdata bookingdata) throws CustomException {
+
+    public MessageWrapper<Bookingdata> setBookingv2(Bookingdata bookingdata,String rqid) throws CustomException {
+        User user = userRepository.findByRqid(rqid);
+        if (user == null) {
+            throw new CustomException(new CustomErrorResponse("01", "RQID is not valid"));
+        }
         List<Pax> paxlist = bookingdata.getPaxlist();
         if (paxlist == null) {
             throw new CustomException(new CustomErrorResponse("10", "No Pax"));
@@ -381,7 +389,7 @@ public class TransactionService {
         Transaction newtrans = new Transaction();
         newtrans.setBookcode(transactionRepository.getBookCode());
         newtrans.setPaycode(transactionRepository.getPayCode());
-        newtrans.setTransdate(bookingdata.getTransdatetime());        
+        newtrans.setTransdate(bookingdata.getTransdatetime());
         newtrans.setTotamount(bookingdata.getTotamount());
         newtrans.setExtrafee(bookingdata.getExtrafee());
         newtrans.setNetamount(bookingdata.getNetamount());
@@ -483,7 +491,7 @@ public class TransactionService {
             newtransdet.setWagondetid(inventoryMap.get(pax.getInventoryid()).getWagondetid());
             newtransdet.setWagondetrow(inventoryMap.get(pax.getInventoryid()).getWagondetrow());
             newtransdet.setWagondetcol(inventoryMap.get(pax.getInventoryid()).getWagondetcol());
-            newtransdet.setAmount(pax.getAmount());            
+            newtransdet.setAmount(pax.getAmount());
             newtransdet.setTicketnum("DUMMYTICKETNUM-" + order);
             newtransdet.setFareid(propscheduleMap.get(bookingdata.getPropscheduleid()).getFareid());
             newtransdet.setFarebasicfare(fareMap.get(newtransdet.getFareid()).getBasicfare());
@@ -503,7 +511,7 @@ public class TransactionService {
             newtransdet.setCreatedby("userpos");
             newtransdet.setCreatedon(LocalDateTime.now());
             newtransdet.setModifiedby("userpos");
-            newtransdet.setModifiedon(LocalDateTime.now());            
+            newtransdet.setModifiedon(LocalDateTime.now());
             newtransdet.setOrder(order);
             newtransdet.setReleasestat("0");
             Transactiondet savetransdet = transactiondetRepository.save(newtransdet);
@@ -522,7 +530,7 @@ public class TransactionService {
             inventory.setBookstat("1");
             inventory.setBookcode(savetrans.getBookcode());
             inventory.setTransactiondetorder(order);
-            inventoryRepository.save(inventory);   
+            inventoryRepository.save(inventory);
             order++;
         }
 
@@ -550,5 +558,5 @@ public class TransactionService {
 
         MessageWrapper<Bookingdata> messageWrapper = new MessageWrapper<>("00", "SUCCESS", result);
         return messageWrapper;
-    }    
+    }
 }

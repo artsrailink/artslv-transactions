@@ -5,8 +5,10 @@ import co.id.artslv.lib.responses.MessageWrapper;
 import co.id.artslv.lib.schedule.PropertySchedule;
 import co.id.artslv.lib.transactions.Bookingdata;
 import co.id.artslv.lib.transactions.Transaction;
+import co.id.artslv.lib.users.User;
 import co.id.artslv.lib.utility.CustomErrorResponse;
 import co.id.artslv.lib.utility.CustomException;
+import co.id.artslv.repository.UserRepository;
 import co.id.artslv.service.DefaultSeatService;
 import co.id.artslv.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +30,10 @@ public class TransactionController {
     private TransactionService transactionService;
     @Autowired
     private DefaultSeatService defaultseatService;
+    @Autowired
+    private UserRepository userRepository;
 
-    @RequestMapping(value = "/details", method = RequestMethod.POST)
+    @RequestMapping(value = "/arts_details", method = RequestMethod.POST)
     public ResponseEntity<?> getTransactionDetails(@RequestBody Transaction transaction) {
         try {
             MessageWrapper<Object> resultWrapper = transactionService.getTransactionDetails(transaction);
@@ -54,10 +58,10 @@ public class TransactionController {
     }
 
     //Booking Tanpa setschedule
-    @RequestMapping(value = "/booking", method = RequestMethod.POST)
-    public ResponseEntity<?> setBooking(@RequestBody Bookingdata bookingdata) {
+    @RequestMapping(value = "/arts_booking/{rqid}", method = RequestMethod.POST)
+    public ResponseEntity<?> setBooking(@RequestBody Bookingdata bookingdata, @PathVariable String rqid) {
         try {
-            MessageWrapper<Bookingdata> resultWrapper = transactionService.setBooking(bookingdata);
+            MessageWrapper<Bookingdata> resultWrapper = transactionService.setBooking(bookingdata, rqid);
             return new ResponseEntity<>(resultWrapper, HttpStatus.OK);
         } catch (CustomException e) {
             CustomErrorResponse customErrorResponse = (CustomErrorResponse) e.getCause();
@@ -65,28 +69,33 @@ public class TransactionController {
             return new ResponseEntity<Object>(transactionError, HttpStatus.OK);
         }
     }
-    
+
     //Booking dengan setschedule
-    @RequestMapping(value = "/bookingv2", method = RequestMethod.POST)
-    public ResponseEntity<?> setBookingv2(@RequestBody Bookingdata bookingdata) {
+    @RequestMapping(value = "/arts_bookingv2/{rqid}", method = RequestMethod.POST)
+    public ResponseEntity<?> setBookingv2(@RequestBody Bookingdata bookingdata, @PathVariable String rqid) {
         try {
-            MessageWrapper<Bookingdata> resultWrapper = transactionService.setBookingv2(bookingdata);
+            MessageWrapper<Bookingdata> resultWrapper = transactionService.setBookingv2(bookingdata, rqid);
             return new ResponseEntity<>(resultWrapper, HttpStatus.OK);
         } catch (CustomException e) {
             CustomErrorResponse customErrorResponse = (CustomErrorResponse) e.getCause();
             MessageWrapper<?> transactionError = new MessageWrapper<>(customErrorResponse);
             return new ResponseEntity<Object>(transactionError, HttpStatus.OK);
         }
-    }    
+    }
 
-    @RequestMapping(value = "/setschedule", method = RequestMethod.POST)
-    public ResponseEntity<?> setschedule(@RequestBody Bookingdata bookingdata) throws CustomException {
+    @RequestMapping(value = "/arts_setschedule/{rqid}", method = RequestMethod.POST)
+    public ResponseEntity<?> setschedule(@RequestBody Bookingdata bookingdata, @PathVariable String rqid) throws CustomException {
         MessageWrapper<List<Inventory>> resultWrapper;
-        List<Inventory> inventorylist = defaultseatService.getDefaultSeat(bookingdata.getDepartdate(), bookingdata.getOrg(), bookingdata.getDest(), bookingdata.getNoka(), bookingdata.getTotpsgadult() + bookingdata.getTotpsgchild() + bookingdata.getTotpsginfant());
-        if (inventorylist == null || inventorylist.isEmpty()) {
-            resultWrapper = new MessageWrapper<>("10", "Seat Not Available", inventorylist);
+        User user = userRepository.findByRqid(rqid);
+        if (user == null) {
+            resultWrapper = new MessageWrapper<>("01", "RQID is not valid");
         } else {
-            resultWrapper = new MessageWrapper<>("00", "SUCCESS", inventorylist);
+            List<Inventory> inventorylist = defaultseatService.getDefaultSeat(bookingdata.getDepartdate(), bookingdata.getOrg(), bookingdata.getDest(), bookingdata.getNoka(), bookingdata.getTotpsgadult() + bookingdata.getTotpsgchild() + bookingdata.getTotpsginfant());
+            if (inventorylist == null || inventorylist.isEmpty()) {
+                resultWrapper = new MessageWrapper<>("10", "Seat Not Available");
+            } else {
+                resultWrapper = new MessageWrapper<>("00", "SUCCESS", inventorylist);
+            }
         }
         return new ResponseEntity<>(resultWrapper, HttpStatus.OK);
     }
