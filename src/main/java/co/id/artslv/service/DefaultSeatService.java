@@ -82,6 +82,7 @@ public class DefaultSeatService {
             List<Inventory> savedData = nSeat.stream().map(inventory -> {
                 String id = inventory.getId();
                 Inventory invent = inventoryRepository.findById(id);
+                invent.setBookstat("1");
                 return invent;
             }).collect(Collectors.toList());
 
