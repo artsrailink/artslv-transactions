@@ -21,8 +21,6 @@ import java.util.stream.Collectors;
 @Service
 public class DefaultSeatService {
 
-    private static final ExecutorService executorService = Executors.newFixedThreadPool(2);
-
     @Autowired
     private InventoryRepository inventoryRepository;
 
@@ -78,16 +76,15 @@ public class DefaultSeatService {
         });
 
         List<Inventory> nSeat = availableBasedOnNoka.stream().limit(noOfPassanger).collect(Collectors.toList());
-        CompletableFuture.supplyAsync(()->{
-            List<Inventory> savedData = nSeat.stream().map(inventory -> {
-                String id = inventory.getId();
-                Inventory invent = inventoryRepository.findById(id);
-                invent.setBookstat("1");
-                return invent;
-            }).collect(Collectors.toList());
 
-            return inventoryRepository.save(savedData);
-        },executorService);
+        List<Inventory> savedData = nSeat.stream().map(inventory -> {
+            String id = inventory.getId();
+            Inventory invent = inventoryRepository.findById(id);
+            invent.setBookstat("1");
+            return invent;
+        }).collect(Collectors.toList());
+
+        inventoryRepository.save(savedData);
 
         return nSeat;
     }
