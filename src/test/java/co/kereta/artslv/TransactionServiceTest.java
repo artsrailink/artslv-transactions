@@ -1490,6 +1490,22 @@ public class TransactionServiceTest {
         System.out.println(result);
     }
 
+    @Test
+    public void testJustMessage() throws IOException {
+        String s = "{\n" +
+                "  \"status\": \"04\",\n" +
+                "  \"message\": \"Transaction not found\"\n" +
+                "}";
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        MessageWrapper<Object> messageWrapper = objectMapper.readValue(s,MessageWrapper.class);
+
+        String result = messageWrapper.getStatus();
+        System.out.println(result);
+
+
+    }
+
 
 }
 
