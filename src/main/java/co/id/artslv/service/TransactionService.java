@@ -354,8 +354,7 @@ public class TransactionService {
             Inventory inventory = inventoryRepository.findOne(inventorylist.get(order - 1).getId());
             if (inventory == null) {
                 throw new CustomException(new CustomErrorResponse("10", "Seat Not Found"));
-            }
-            inventory.setBookstat("1");
+            }           
             inventory.setBookcode(savetrans.getBookcode());
             inventory.setTransactiondetorder(order);
             inventory.setSubclassid(savetransdet.getSubclassid());
@@ -563,8 +562,7 @@ public class TransactionService {
             Inventory inventory = inventoryRepository.findOne(inventoryMap.get(pax.getInventoryid()).getId());
             if (inventory == null) {
                 throw new CustomException(new CustomErrorResponse("10", "Seat Not Found"));
-            }
-            inventory.setBookstat("1");
+            }            
             inventory.setBookcode(savetrans.getBookcode());
             inventory.setTransactiondetorder(order);
             inventory.setSubclassid(savetransdet.getSubclassid());
