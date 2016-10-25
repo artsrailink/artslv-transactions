@@ -198,7 +198,7 @@ public class TransactionService {
         newtrans.setTotamount(bookingdata.getTotamount());
         newtrans.setExtrafee(bookingdata.getExtrafee());
         newtrans.setNetamount(bookingdata.getNetamount());
-        newtrans.setPaidamount(bookingdata.getPaidamoount());
+        newtrans.setPaidamount(bookingdata.getPaidamount());
         newtrans.setCustname(bookingdata.getCustname());
         newtrans.setPhonenum(bookingdata.getPhone());
         newtrans.setEmail(bookingdata.getEmail());
@@ -401,7 +401,7 @@ public class TransactionService {
         newtrans.setTotamount(bookingdata.getTotamount());
         newtrans.setExtrafee(bookingdata.getExtrafee());
         newtrans.setNetamount(bookingdata.getNetamount());
-        newtrans.setPaidamount(bookingdata.getPaidamoount());
+        newtrans.setPaidamount(bookingdata.getPaidamount());
         newtrans.setCustname(bookingdata.getCustname());
         newtrans.setPhonenum(bookingdata.getPhone());
         newtrans.setEmail(bookingdata.getEmail());
