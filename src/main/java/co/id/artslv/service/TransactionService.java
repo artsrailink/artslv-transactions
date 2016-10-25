@@ -134,7 +134,6 @@ public class TransactionService {
 
         String result = restTemplate.getForObject(url, String.class);
 
-
         MessageWrapper<Object> messageWrapper = new MessageWrapper<>();
         List<AvailabilityData> availabilityDatas = messageWrapper.getValue(result, "availabilitydatalist", new TypeReference<List<AvailabilityData>>() {
         });
@@ -143,7 +142,7 @@ public class TransactionService {
             MessageWrapper<Object> errorMessage = MessageWrapper.getMessageAndStatus(result);
             String status = errorMessage.getStatus();
             String message = errorMessage.getMessage();
-            throw new CustomException(new CustomErrorResponse(status,message));
+            throw new CustomException(new CustomErrorResponse(status, message));
         }
 
         AvailabilityData avadata = availabilityDatas.get(0);
@@ -310,7 +309,17 @@ public class TransactionService {
             newtransdet.setWagondetrow(inventorylist.get(order - 1).getWagondetrow());
             newtransdet.setWagondetcol(inventorylist.get(order - 1).getWagondetcol());
             newtransdet.setAmount(pax.getAmount());
-            newtransdet.setTicketnum("DUMMYTICKETNUM-" + order);
+            switch (String.valueOf(order).length()) {
+                case 1:
+                    newtransdet.setTicketnum(savetrans.getBookcode() + "00" + String.valueOf(order));
+                    break;
+                case 2:
+                    newtransdet.setTicketnum(savetrans.getBookcode() + "0" + String.valueOf(order));
+                    break;
+                default:
+                    newtransdet.setTicketnum(savetrans.getBookcode()+String.valueOf(order));
+                    break;
+            }
             newtransdet.setFareid(propscheduleMap.get(bookingdata.getPropscheduleid()).getFareid());
             newtransdet.setFarebasicfare(fareMap.get(newtransdet.getFareid()).getBasicfare());
             newtransdet.setFaretuslahfee(fareMap.get(newtransdet.getFareid()).getTuslahfee());
@@ -364,7 +373,9 @@ public class TransactionService {
         result.setArrivedate(propscheduleMap.get(bookingdata.getPropscheduleid()).getTripdate());
         result.setArrivetime(propscheduleMap.get(bookingdata.getPropscheduleid()).getStoparrival());
         result.setOrg(savetrans.getStasiuncodeorg());
+        result.setOrgname(propscheduleMap.get(bookingdata.getPropscheduleid()).getStasiunnameorg());
         result.setDest(savetrans.getStasiuncodedes());
+        result.setDestname(propscheduleMap.get(bookingdata.getPropscheduleid()).getStasiunnamedes());
         result.setBookcode(savetrans.getBookcode());
         result.setNoka(savetrans.getSchedulenoka());
         result.setTrainname(savetrans.getScheduleTrainname());
@@ -508,7 +519,17 @@ public class TransactionService {
             newtransdet.setWagondetrow(inventoryMap.get(pax.getInventoryid()).getWagondetrow());
             newtransdet.setWagondetcol(inventoryMap.get(pax.getInventoryid()).getWagondetcol());
             newtransdet.setAmount(pax.getAmount());
-            newtransdet.setTicketnum("DUMMYTICKETNUM-" + order);
+            switch (String.valueOf(order).length()) {
+                case 1:
+                    newtransdet.setTicketnum(savetrans.getBookcode() + "00" + String.valueOf(order));
+                    break;
+                case 2:
+                    newtransdet.setTicketnum(savetrans.getBookcode() + "0" + String.valueOf(order));
+                    break;
+                default:
+                    newtransdet.setTicketnum(savetrans.getBookcode()+String.valueOf(order));
+                    break;
+            }
             newtransdet.setFareid(propscheduleMap.get(bookingdata.getPropscheduleid()).getFareid());
             newtransdet.setFarebasicfare(fareMap.get(newtransdet.getFareid()).getBasicfare());
             newtransdet.setFaretuslahfee(fareMap.get(newtransdet.getFareid()).getTuslahfee());
@@ -561,7 +582,9 @@ public class TransactionService {
         result.setArrivedate(propscheduleMap.get(bookingdata.getPropscheduleid()).getTripdate());
         result.setArrivetime(propscheduleMap.get(bookingdata.getPropscheduleid()).getStoparrival());
         result.setOrg(savetrans.getStasiuncodeorg());
+        result.setOrgname(propscheduleMap.get(bookingdata.getPropscheduleid()).getStasiunnameorg());
         result.setDest(savetrans.getStasiuncodedes());
+        result.setDestname(propscheduleMap.get(bookingdata.getPropscheduleid()).getStasiunnamedes());
         result.setBookcode(savetrans.getBookcode());
         result.setNoka(savetrans.getSchedulenoka());
         result.setTrainname(savetrans.getScheduleTrainname());
