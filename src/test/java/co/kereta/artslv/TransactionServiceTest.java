@@ -9,6 +9,7 @@ import co.id.artslv.lib.transactions.Transactiondet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.junit.Test;
+import org.junit.runner.Result;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -1502,6 +1503,15 @@ public class TransactionServiceTest {
 
         String result = messageWrapper.getStatus();
         System.out.println(result);
+
+
+        MessageWrapper<Object> objectMessageWrapper = new MessageWrapper<>();
+        AvailabilityData ava  =objectMessageWrapper.getValue(s, "availabilitydatalist", new com.fasterxml.jackson.core.type.TypeReference<AvailabilityData>() {
+        });
+
+        if(ava==null){
+            System.out.println("TEST");
+        }
 
 
     }
