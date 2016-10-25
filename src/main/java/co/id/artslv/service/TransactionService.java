@@ -178,12 +178,13 @@ public class TransactionService {
             throw new CustomException(new CustomErrorResponse("01", "RQID is not valid"));
         }
         List<Pax> paxlist = bookingdata.getPaxlist();
-        if (paxlist == null) {
+        if (paxlist == null || paxlist.isEmpty()) {
             throw new CustomException(new CustomErrorResponse("10", "No Pax"));
         }
         if (bookingdata.getPropscheduleid() == null || bookingdata.getPropscheduleid().isEmpty()) {
             throw new CustomException(new CustomErrorResponse("10", "PropSchedule cannot be Empty"));
         }
+
         List<PropertySchedule> propSchedulelist = propertyscheduleRepository.findAll();
         Map<String, PropertySchedule> propscheduleMap = propSchedulelist.stream().collect(Collectors.toMap(PropertySchedule::getId, p -> p));
         List<Fare> farelist = fareRepository.findAll();
@@ -245,11 +246,15 @@ public class TransactionService {
         newtrans.setModifiedby("userpos");
         newtrans.setModifiedon(LocalDateTime.now());
 
+        List<Inventory> inventorylist = defaultseatservice.getDefaultSeat(newtrans.getTripdate(), newtrans.getStasiuncodeorg(), newtrans.getStasiuncodedes(), newtrans.getSchedulenoka(), paxlist.size());
+        if (inventorylist == null || inventorylist.isEmpty()) {
+            throw new CustomException(new CustomErrorResponse("10", "Seat Not Available"));
+        }
+
         Transaction savetrans = transactionRepository.save(newtrans);
         if (savetrans == null) {
             throw new CustomException(new CustomErrorResponse("10", "Booking (Insert Transaction) Failed"));
         }
-        List<Inventory> inventorylist = defaultseatservice.getDefaultSeat(savetrans.getTripdate(), savetrans.getStasiuncodeorg(), savetrans.getStasiuncodedes(), savetrans.getSchedulenoka(), paxlist.size());
         //insert transactiondet
         int order = 1;
         List<Pax> newpaxlist = new ArrayList<>();
@@ -326,6 +331,7 @@ public class TransactionService {
             pax.setSeat(newtransdet.getStamformdetcode() + "/" + newtransdet.getWagondetrow() + newtransdet.getWagondetcol());
             pax.setWagondetrow(newtransdet.getWagondetrow());
             pax.setWagondetcol(newtransdet.getWagondetcol());
+            pax.setInventoryid(inventorylist.get(order - 1).getId());
             newpaxlist.add(pax);
 
             Inventory inventory = inventoryRepository.findOne(inventorylist.get(order - 1).getId());
@@ -374,7 +380,7 @@ public class TransactionService {
             throw new CustomException(new CustomErrorResponse("01", "RQID is not valid"));
         }
         List<Pax> paxlist = bookingdata.getPaxlist();
-        if (paxlist == null) {
+        if (paxlist == null || paxlist.isEmpty()) {
             throw new CustomException(new CustomErrorResponse("10", "No Pax"));
         }
         if (bookingdata.getPropscheduleid() == null || bookingdata.getPropscheduleid().isEmpty()) {
