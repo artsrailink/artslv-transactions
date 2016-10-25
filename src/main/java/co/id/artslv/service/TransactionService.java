@@ -134,9 +134,17 @@ public class TransactionService {
 
         String result = restTemplate.getForObject(url, String.class);
 
+
         MessageWrapper<Object> messageWrapper = new MessageWrapper<>();
         List<AvailabilityData> availabilityDatas = messageWrapper.getValue(result, "availabilitydatalist", new TypeReference<List<AvailabilityData>>() {
         });
+
+        if (availabilityDatas == null) {
+            MessageWrapper<Object> errorMessage = MessageWrapper.getMessageAndStatus(result);
+            String status = errorMessage.getStatus();
+            String message = errorMessage.getMessage();
+            throw new CustomException(new CustomErrorResponse(status,message));
+        }
 
         AvailabilityData avadata = availabilityDatas.get(0);
         ScheduleData scheduleData = avadata.getScheduleDatas().get(0);
@@ -198,7 +206,7 @@ public class TransactionService {
         newtrans.setTotamount(bookingdata.getTotamount());
         newtrans.setExtrafee(bookingdata.getExtrafee());
         newtrans.setNetamount(bookingdata.getNetamount());
-        newtrans.setPaidamount(bookingdata.getPaidamoount());
+        newtrans.setPaidamount(bookingdata.getPaidamount());
         newtrans.setCustname(bookingdata.getCustname());
         newtrans.setPhonenum(bookingdata.getPhone());
         newtrans.setEmail(bookingdata.getEmail());
@@ -401,7 +409,7 @@ public class TransactionService {
         newtrans.setTotamount(bookingdata.getTotamount());
         newtrans.setExtrafee(bookingdata.getExtrafee());
         newtrans.setNetamount(bookingdata.getNetamount());
-        newtrans.setPaidamount(bookingdata.getPaidamoount());
+        newtrans.setPaidamount(bookingdata.getPaidamount());
         newtrans.setCustname(bookingdata.getCustname());
         newtrans.setPhonenum(bookingdata.getPhone());
         newtrans.setEmail(bookingdata.getEmail());
