@@ -17,7 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,11 +45,18 @@ public class DefaultSeatService {
     @Transactional(rollbackFor = CustomException.class,propagation = Propagation.REQUIRED)
     public List<Inventory> getDefaultSeat(LocalDate tripdate, String orgstasiun, String deststasiun, String noka, int noOfPassanger,String propertyid) throws CustomException {
 
+        PropertySchedule propertySchedule =  propertyScheduleRepository.findById(propertyid);
+        int searemaining = propertySchedule.getSeatavailable();
+        if(searemaining<noOfPassanger){
+            throw new CustomException(new CustomErrorResponse("10","No Seat Available"));
+        }
 
         List<Stop> stopOrigin = stopRepository.findByStatsiuncode(orgstasiun);
         List<Stop> stopDestination = stopRepository.findByStatsiuncode(deststasiun);
         int orgOrder = stopOrigin.get(0).getStoporder();
         int destOrder = stopDestination.get(0).getStoporder();
+
+        Map<String,Integer> stoporderMap = seatStopOrder(orgOrder,destOrder);
 
         int orderBenchmark = orgOrder<destOrder?orgOrder:destOrder;
         if(orgOrder>destOrder){
@@ -97,14 +106,16 @@ public class DefaultSeatService {
         List<Inventory> nSeat = availableBasedOnNoka.stream().limit(noOfPassanger).collect(Collectors.toList());
 
 
+
         List<Inventory> updatedInventoryOrgtoDes = new ArrayList<>();
-        nSeat.forEach(inventory -> {
-            updatedInventoryOrgtoDes.addAll(inventoryRepository.findByStamformdetidAndWagondetid(inventory.getStamformdetid(),inventory.getWagondetid()));
-        });
+
+        for(Inventory inv:nSeat){
+            updatedInventoryOrgtoDes.addAll(inventoryRepository.findByStamformdetidAndWagondetidAndStoporderBetween(inv.getStamformdetid(),inv.getWagondetid(),stoporderMap.get("origin"),stoporderMap.get("dest")));
+        }
         updatedInventoryOrgtoDes.forEach(i->i.setBookstat("1"));
         inventoryRepository.save(updatedInventoryOrgtoDes);
 
-        PropertySchedule propertySchedule =  propertyScheduleRepository.findById(propertyid);
+
         int avaseat = propertySchedule.getSeatavailable();
         int remainingseat = (avaseat-noOfPassanger)>0?(avaseat-noOfPassanger):0;
         propertySchedule.setSeatavailable(remainingseat);
@@ -112,6 +123,27 @@ public class DefaultSeatService {
         propertyScheduleRepository.save(propertySchedule);
 
         return nSeat;
+    }
+
+
+    private Map<String,Integer> seatStopOrder(int orginOrder,int destOrder){
+        int stopOrderOrg = 0;
+        int stopOrderDest = 0;
+        if(orginOrder>destOrder){
+            int temp = orginOrder;
+            orginOrder = destOrder;
+            destOrder = temp;
+
+            stopOrderOrg = orginOrder+1;
+            stopOrderDest = destOrder;
+        }else{
+            stopOrderOrg = orginOrder;
+            stopOrderDest = destOrder-1;
+        }
+        Map<String,Integer> map = new HashMap<>();
+        map.put("origin",stopOrderOrg);
+        map.put("dest",stopOrderDest);
+        return map;
     }
 
 
