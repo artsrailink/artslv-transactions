@@ -96,27 +96,23 @@ public class DefaultSeatService {
 
         List<Inventory> nSeat = availableBasedOnNoka.stream().limit(noOfPassanger).collect(Collectors.toList());
 
-        CompletableFuture.supplyAsync(()->{
-            nSeat.stream().map(inventory -> {
-                String id = inventory.getId();
-                Inventory invent = inventoryRepository.findById(id);
-                invent.setBookstat("1");
-                return invent;
-            }).collect(Collectors.toList());
-            return nSeat;
-        },ex).thenAcceptAsync(seats->{
-            inventoryRepository.save(seats); //update bookstat
-        },ex);
 
-        CompletableFuture.supplyAsync(()->{
-            PropertySchedule propertySchedule =  propertyScheduleRepository.findById(propertyid);
-            int avaseat = propertySchedule.getSeatavailable();
-            int remainingseat = (avaseat-noOfPassanger)>0?(avaseat-noOfPassanger):0;
-            propertySchedule.setSeatavailable(remainingseat);
-            return propertySchedule;
-        },ex).thenAcceptAsync(prop->propertyScheduleRepository.save(prop),ex);
+        List<Inventory> updatedInventoryOrgtoDes = new ArrayList<>();
+        nSeat.forEach(inventory -> {
+            updatedInventoryOrgtoDes.addAll(inventoryRepository.findByStamformdetidAndWagondetid(inventory.getStamformdetid(),inventory.getWagondetid()));
+        });
+        updatedInventoryOrgtoDes.forEach(i->i.setBookstat("1"));
+        inventoryRepository.save(updatedInventoryOrgtoDes);
+
+        PropertySchedule propertySchedule =  propertyScheduleRepository.findById(propertyid);
+        int avaseat = propertySchedule.getSeatavailable();
+        int remainingseat = (avaseat-noOfPassanger)>0?(avaseat-noOfPassanger):0;
+        propertySchedule.setSeatavailable(remainingseat);
+
+        propertyScheduleRepository.save(propertySchedule);
 
         return nSeat;
     }
+
 
 }
