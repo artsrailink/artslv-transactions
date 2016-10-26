@@ -30,6 +30,7 @@ public class TransactionController {
     private TransactionService transactionService;
     @Autowired
     private DefaultSeatService defaultseatService;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -84,19 +85,20 @@ public class TransactionController {
     }
 
     @RequestMapping(value = "/arts_setschedule/{rqid}", method = RequestMethod.POST)
-    public ResponseEntity<?> setschedule(@RequestBody Bookingdata bookingdata, @PathVariable String rqid) throws CustomException {
-        MessageWrapper<List<Inventory>> resultWrapper;
-        User user = userRepository.findByRqid(rqid);
-        if (user == null) {
-            resultWrapper = new MessageWrapper<>("01", "RQID is not valid");
-        } else {
-            List<Inventory> inventorylist = defaultseatService.getDefaultSeat(bookingdata.getDepartdate(), bookingdata.getOrg(), bookingdata.getDest(), bookingdata.getNoka(), bookingdata.getTotpsgadult() + bookingdata.getTotpsgchild() + bookingdata.getTotpsginfant());
-            if (inventorylist == null || inventorylist.isEmpty()) {
-                resultWrapper = new MessageWrapper<>("10", "Seat Not Available");
-            } else {
-                resultWrapper = new MessageWrapper<>("00", "SUCCESS", inventorylist);
+    public ResponseEntity<?> setschedule(@RequestBody Bookingdata bookingdata, @PathVariable String rqid) {
+
+        try {
+            User user = userRepository.findByRqid(rqid);
+            if (user == null) {
+                throw new CustomException(new CustomErrorResponse("01","RQID is not valid"));
             }
+            List<Inventory> inventorylist = defaultseatService.getDefaultSeat(bookingdata.getDepartdate(), bookingdata.getOrg(), bookingdata.getDest(), bookingdata.getNoka(), bookingdata.getTotpsgadult() + bookingdata.getTotpsgchild() + bookingdata.getTotpsginfant(),bookingdata.getPropscheduleid());
+            MessageWrapper<List<Inventory>> resultWrapper = new MessageWrapper<>("00","SUCCESS",inventorylist);
+            return new ResponseEntity<>(resultWrapper, HttpStatus.OK);
+        } catch (CustomException e) {
+            MessageWrapper<?> errorMessage = new MessageWrapper<>((CustomErrorResponse) e.getCause());
+            return new ResponseEntity<>(errorMessage,HttpStatus.OK);
         }
-        return new ResponseEntity<>(resultWrapper, HttpStatus.OK);
+
     }
 }

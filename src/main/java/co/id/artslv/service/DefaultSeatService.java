@@ -1,11 +1,19 @@
 package co.id.artslv.service;
 
 import co.id.artslv.lib.inventory.Inventory;
+import co.id.artslv.lib.schedule.PropertySchedule;
 import co.id.artslv.lib.schedule.Stop;
+import co.id.artslv.lib.users.User;
+import co.id.artslv.lib.utility.CustomErrorResponse;
+import co.id.artslv.lib.utility.CustomException;
 import co.id.artslv.repository.InventoryRepository;
+import co.id.artslv.repository.PropertyScheduleRepository;
 import co.id.artslv.repository.StopRepository;
+import co.id.artslv.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,7 +35,14 @@ public class DefaultSeatService {
     @Autowired
     private StopRepository stopRepository;
 
-    public List<Inventory> getDefaultSeat(LocalDate tripdate, String orgstasiun, String deststasiun, String noka, int noOfPassanger){
+    @Autowired
+    private PropertyScheduleRepository propertyScheduleRepository;
+
+    private static final ExecutorService ex = Executors.newFixedThreadPool(2);
+
+    @Transactional(rollbackFor = CustomException.class,propagation = Propagation.REQUIRED)
+    public List<Inventory> getDefaultSeat(LocalDate tripdate, String orgstasiun, String deststasiun, String noka, int noOfPassanger,String propertyid) throws CustomException {
+
 
         List<Stop> stopOrigin = stopRepository.findByStatsiuncode(orgstasiun);
         List<Stop> stopDestination = stopRepository.findByStatsiuncode(deststasiun);
@@ -65,6 +80,10 @@ public class DefaultSeatService {
             availableSeats.add(availableSeat);
         });
 
+        if(availableSeats==null || availableSeats.isEmpty()){
+            throw new CustomException(new CustomErrorResponse("10","No Seat Available"));
+        }
+
         //Filter based on noka
         List<Inventory> availableBasedOnNoka = availableSeats.stream().filter(avail->avail.getSchedulenoka().equals(noka)).collect(Collectors.toList());
 
@@ -77,15 +96,27 @@ public class DefaultSeatService {
 
         List<Inventory> nSeat = availableBasedOnNoka.stream().limit(noOfPassanger).collect(Collectors.toList());
 
-        List<Inventory> savedData = nSeat.stream().map(inventory -> {
-            String id = inventory.getId();
-            Inventory invent = inventoryRepository.findById(id);
-            invent.setBookstat("1");
-            return invent;
-        }).collect(Collectors.toList());
+        CompletableFuture.supplyAsync(()->{
+            nSeat.stream().map(inventory -> {
+                String id = inventory.getId();
+                Inventory invent = inventoryRepository.findById(id);
+                invent.setBookstat("1");
+                return invent;
+            }).collect(Collectors.toList());
+            return nSeat;
+        },ex).thenAcceptAsync(seats->{
+            inventoryRepository.save(seats); //update bookstat
+        },ex);
 
-        inventoryRepository.save(savedData);
+        CompletableFuture.supplyAsync(()->{
+            PropertySchedule propertySchedule =  propertyScheduleRepository.findById(propertyid);
+            int avaseat = propertySchedule.getSeatavailable();
+            int remainingseat = (avaseat-noOfPassanger)>0?(avaseat-noOfPassanger):0;
+            propertySchedule.setSeatavailable(remainingseat);
+            return propertySchedule;
+        },ex).thenAcceptAsync(prop->propertyScheduleRepository.save(prop),ex);
 
         return nSeat;
     }
+
 }

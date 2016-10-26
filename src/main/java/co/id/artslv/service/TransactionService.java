@@ -253,7 +253,7 @@ public class TransactionService {
         newtrans.setModifiedby("userpos");
         newtrans.setModifiedon(LocalDateTime.now());
 
-        List<Inventory> inventorylist = defaultseatservice.getDefaultSeat(newtrans.getTripdate(), newtrans.getStasiuncodeorg(), newtrans.getStasiuncodedes(), newtrans.getSchedulenoka(), paxlist.size());
+        List<Inventory> inventorylist = defaultseatservice.getDefaultSeat(newtrans.getTripdate(), newtrans.getStasiuncodeorg(), newtrans.getStasiuncodedes(), newtrans.getSchedulenoka(), paxlist.size(),bookingdata.getPropscheduleid());
         if (inventorylist == null || inventorylist.isEmpty()) {
             throw new CustomException(new CustomErrorResponse("10", "Seat Not Available"));
         }
