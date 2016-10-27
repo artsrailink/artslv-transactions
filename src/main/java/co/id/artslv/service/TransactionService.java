@@ -14,7 +14,11 @@ import co.id.artslv.lib.users.User;
 import co.id.artslv.lib.utility.CustomErrorResponse;
 import co.id.artslv.lib.utility.CustomException;
 import co.id.artslv.repository.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +57,8 @@ public class TransactionService {
 
     @Autowired
     private UserRepository userRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(TransactionService.class);
 
     @Transactional(rollbackFor = CustomException.class)
     public MessageWrapper<List<Transaction>> getAllTransaction() throws CustomException {
@@ -393,6 +399,14 @@ public class TransactionService {
     }
 
     public MessageWrapper<Bookingdata> setBookingv2(Bookingdata bookingdata, String rqid) throws CustomException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String request = objectMapper.writeValueAsString(bookingdata);
+            logger.info(request);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
         User user = userRepository.findByRqid(rqid);
         if (user == null) {
             throw new CustomException(new CustomErrorResponse("01", "RQID is not valid"));

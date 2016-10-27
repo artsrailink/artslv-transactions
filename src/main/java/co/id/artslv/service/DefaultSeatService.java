@@ -10,6 +10,10 @@ import co.id.artslv.repository.InventoryRepository;
 import co.id.artslv.repository.PropertyScheduleRepository;
 import co.id.artslv.repository.StopRepository;
 import co.id.artslv.repository.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -41,6 +45,7 @@ public class DefaultSeatService {
     private PropertyScheduleRepository propertyScheduleRepository;
 
     private static final ExecutorService ex = Executors.newFixedThreadPool(2);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultSeatService.class);
 
     @Transactional(rollbackFor = CustomException.class,propagation = Propagation.REQUIRED)
     public List<Inventory> getDefaultSeat(LocalDate tripdate, String orgstasiun, String deststasiun, String noka, int noOfPassanger,String propertyid) throws CustomException {
@@ -122,6 +127,8 @@ public class DefaultSeatService {
 
         propertyScheduleRepository.save(propertySchedule);
 
+        logger.info(writeSeatLogs(nSeat));
+
         return nSeat;
     }
 
@@ -146,5 +153,14 @@ public class DefaultSeatService {
         return map;
     }
 
-
+    public String writeSeatLogs(List<Inventory> seats){
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String value = objectMapper.writeValueAsString(seats);
+            return value;
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
