@@ -354,6 +354,7 @@ public class TransactionService {
             pax.setSeat(newtransdet.getStamformdetcode() + "/" + newtransdet.getWagondetrow() + newtransdet.getWagondetcol());
             pax.setWagondetrow(newtransdet.getWagondetrow());
             pax.setWagondetcol(newtransdet.getWagondetcol());
+            pax.setTicketnum(newtransdet.getTicketnum());
             pax.setInventoryid(inventorylist.get(order - 1).getId());
             newpaxlist.add(pax);
 
@@ -571,6 +572,7 @@ public class TransactionService {
             pax.setSeat(newtransdet.getStamformdetcode() + "/" + newtransdet.getWagondetrow() + newtransdet.getWagondetcol());
             pax.setWagondetrow(newtransdet.getWagondetrow());
             pax.setWagondetcol(newtransdet.getWagondetcol());
+            pax.setTicketnum(newtransdet.getTicketnum());
             newpaxlist.add(pax);
 
             Inventory inventory = inventoryRepository.findOne(inventoryMap.get(pax.getInventoryid()).getId());
