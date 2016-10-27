@@ -8,4 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface PropertyScheduleRepository extends JpaRepository<PropertySchedule,String>{
     PropertySchedule findById(String id);
+    PropertySchedule findByStoporderorgAndStoporderdestAndSubclasscodeAndNoka(int org,int dest,String subclass,String noka);
 }

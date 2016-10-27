@@ -20,10 +20,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -124,11 +121,7 @@ public class DefaultSeatService {
         updatedInventoryOrgtoDes.forEach(i->i.setBookstat("1"));
         inventoryRepository.save(updatedInventoryOrgtoDes);
 
-        int avaseat = propertySchedule.getSeatavailable();
-        int remainingseat = (avaseat-noOfPassanger)>0?(avaseat-noOfPassanger):0;
-        propertySchedule.setSeatavailable(remainingseat);
-
-        propertyScheduleRepository.save(propertySchedule);
+        updateAvailableSeat(propertyid,noka,noOfPassanger);
 
         logger.info(writeSeatLogs(nSeat));
 
@@ -165,5 +158,33 @@ public class DefaultSeatService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public List<PropertySchedule> updateAvailableSeat(String propertyid, String noka, int noOfPassanger){
+        logger.info("updateAvailableSeat");
+        PropertySchedule propertySchedule =  propertyScheduleRepository.findById(propertyid);
+        int stoporg = propertySchedule.getStoporderorg();
+        int stopdest = propertySchedule.getStoporderdest();
+        String subclass = propertySchedule.getSubclasscode();
+        int count = 0;
+        Map<Integer,List<Integer>> map = new HashMap<>();
+        for(int i=stoporg;i<stopdest;i++){
+            for(int j=i+1;j<=stopdest;j++){
+                count++;
+                map.put(count, Arrays.asList(i,j));
+            }
+        }
+        List<PropertySchedule> updatedPropertySchedule = new ArrayList<>();
+        Set<Map.Entry<Integer,List<Integer>>> entrys = map.entrySet();
+        for(Map.Entry<Integer,List<Integer>> entry:entrys){
+            List<Integer> stopedge = entry.getValue();
+            PropertySchedule pro = propertyScheduleRepository.findByStoporderorgAndStoporderdestAndSubclasscodeAndNoka(stopedge.get(0),stopedge.get(1),subclass,noka);
+            int avaseat = pro.getSeatavailable();
+            int remainingseat = (avaseat-noOfPassanger)>0?(avaseat-noOfPassanger):0;
+            pro.setSeatavailable(remainingseat);
+            updatedPropertySchedule.add(pro);
+        }
+        List<PropertySchedule> updatedResult = propertyScheduleRepository.save(updatedPropertySchedule);
+        return updatedResult;
     }
 }

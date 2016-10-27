@@ -12,8 +12,7 @@ import org.junit.Test;
 import org.junit.runner.Result;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -1513,6 +1512,26 @@ public class TransactionServiceTest {
             System.out.println("TEST");
         }
 
+
+    }
+
+    @Test
+    public void orderTest(){
+        int org = 2;
+        int dest = 5;
+        int count = 0;
+        Map<Integer,List<Integer>> map = new HashMap<>();
+        for(int i=org;i<dest;i++){
+            for(int j=i+1;j<=dest;j++){
+                count++;
+                map.put(count, Arrays.asList(i,j));
+            }
+        }
+        Set<Map.Entry<Integer,List<Integer>>> entrys = map.entrySet();
+        for(Map.Entry<Integer,List<Integer>> entry:entrys){
+            List<Integer> stopedge = entry.getValue();
+            System.out.println(stopedge);
+        }
 
     }
 

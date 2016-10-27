@@ -28,14 +28,15 @@ spring:
     url: jdbc:mysql://artsdev.clpcb7xlzus1.us-east-1.rds.amazonaws.com:3306/ARTSDEV
     username: ARTSDEV
     password: ARTSDEVGP
-  jpa:
-    show-sql: true
+#  jpa:
+#   show-sql: true
+
 #spring:
 #  datasource:
 #    driver-class-name: com.mysql.jdbc.Driver
-#    url: jdbc:mysql://artsdev.clpcb7xlzus1.us-east-1.rds.amazonaws.com:3306/ARTSDEV
-#    username: ARTSDEV
-#    password: ARTSDEVGP    
+#    url: jdbc:mysql://localhost:3306/ARTSDEV
+#    username: root
+#    password: root
 
 #logging:
 #  file: /usr/logging/transaction.log
