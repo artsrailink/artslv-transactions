@@ -92,7 +92,7 @@ public class TransactionController {
 
     @RequestMapping(value = "/arts_setschedule/{rqid}", method = RequestMethod.POST)
     public ResponseEntity<?> setschedule(@RequestBody Bookingdata bookingdata, @PathVariable String rqid) throws JsonProcessingException {
-        logger.info("Go To set Schedule Controller");
+        logger.info("Go To setschedule");
         ObjectMapper om = new ObjectMapper();
         String request = om.writeValueAsString(bookingdata);
         logger.info(request);
