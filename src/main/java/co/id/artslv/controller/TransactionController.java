@@ -11,6 +11,10 @@ import co.id.artslv.lib.utility.CustomException;
 import co.id.artslv.repository.UserRepository;
 import co.id.artslv.service.DefaultSeatService;
 import co.id.artslv.service.TransactionService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +37,8 @@ public class TransactionController {
 
     @Autowired
     private UserRepository userRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
 
     @RequestMapping(value = "/arts_details", method = RequestMethod.POST)
     public ResponseEntity<?> getTransactionDetails(@RequestBody Transaction transaction) {
@@ -85,8 +91,11 @@ public class TransactionController {
     }
 
     @RequestMapping(value = "/arts_setschedule/{rqid}", method = RequestMethod.POST)
-    public ResponseEntity<?> setschedule(@RequestBody Bookingdata bookingdata, @PathVariable String rqid) {
-
+    public ResponseEntity<?> setschedule(@RequestBody Bookingdata bookingdata, @PathVariable String rqid) throws JsonProcessingException {
+        logger.info("Go To set Schedule Controller");
+        ObjectMapper om = new ObjectMapper();
+        String request = om.writeValueAsString(bookingdata);
+        logger.info(request);
         try {
             User user = userRepository.findByRqid(rqid);
             if (user == null) {

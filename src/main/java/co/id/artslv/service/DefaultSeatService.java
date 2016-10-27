@@ -50,16 +50,23 @@ public class DefaultSeatService {
     @Transactional(rollbackFor = CustomException.class,propagation = Propagation.REQUIRED)
     public List<Inventory> getDefaultSeat(LocalDate tripdate, String orgstasiun, String deststasiun, String noka, int noOfPassanger,String propertyid) throws CustomException {
 
+        logger.info("Go To getDefaultSeat");
+
         PropertySchedule propertySchedule =  propertyScheduleRepository.findById(propertyid);
         int searemaining = propertySchedule.getSeatavailable();
+
+        logger.info("Go To getDefaultSeat ======> 1");
         if(searemaining<noOfPassanger){
             throw new CustomException(new CustomErrorResponse("10","No Seat Available"));
         }
+        logger.info("Go To getDefaultSeat ======> 2");
 
         List<Stop> stopOrigin = stopRepository.findByStatsiuncode(orgstasiun);
         List<Stop> stopDestination = stopRepository.findByStatsiuncode(deststasiun);
         int orgOrder = stopOrigin.get(0).getStoporder();
         int destOrder = stopDestination.get(0).getStoporder();
+
+        logger.info("Go To getDefaultSeat ======> 3");
 
         Map<String,Integer> stoporderMap = seatStopOrder(orgOrder,destOrder);
 
@@ -70,12 +77,16 @@ public class DefaultSeatService {
             destOrder = temp;
         }
 
+        logger.info("Go To getDefaultSeat ======> 4");
+
         List<Inventory> benchmarkOriginInventory = inventoryRepository.findByBookstatAndTripdateAndStoporder("0",tripdate,orderBenchmark);
         List<Inventory> occupiedSeatBetweenOrgNDest = inventoryRepository.findByBookstatAndTripdateAndStoporderBetween("1",tripdate,orgOrder,destOrder);
         //Remove data occupied seat from benchmark
         occupiedSeatBetweenOrgNDest.forEach(inventory -> {
             benchmarkOriginInventory.removeIf(p->p.getWagondetid().equals(inventory.getWagondetid()) && p.getStamformdetcode().equals(inventory.getStamformdetcode()));
         });
+
+        logger.info("Go To getDefaultSeat ======> 5");
 
         List<Inventory> availableSeats = new ArrayList<>();
         benchmarkOriginInventory.forEach(inventory -> {
@@ -94,9 +105,15 @@ public class DefaultSeatService {
             availableSeats.add(availableSeat);
         });
 
+        logger.info("Go To getDefaultSeat ======> 6");
+
+
+
         if(availableSeats==null || availableSeats.isEmpty()){
             throw new CustomException(new CustomErrorResponse("10","No Seat Available"));
         }
+
+        logger.info("Go To getDefaultSeat ======> 7");
 
         //Filter based on noka
         List<Inventory> availableBasedOnNoka = availableSeats.stream().filter(avail->avail.getSchedulenoka().equals(noka)).collect(Collectors.toList());
@@ -108,18 +125,21 @@ public class DefaultSeatService {
             return comb1.compareTo(comb2);
         });
 
+        logger.info("Go To getDefaultSeat ======> 8");
+
         List<Inventory> nSeat = availableBasedOnNoka.stream().limit(noOfPassanger).collect(Collectors.toList());
-
-
 
         List<Inventory> updatedInventoryOrgtoDes = new ArrayList<>();
 
         for(Inventory inv:nSeat){
             updatedInventoryOrgtoDes.addAll(inventoryRepository.findByStamformdetidAndWagondetidAndStoporderBetween(inv.getStamformdetid(),inv.getWagondetid(),stoporderMap.get("origin"),stoporderMap.get("dest")));
         }
+
+        logger.info("Go To getDefaultSeat ======> 9");
         updatedInventoryOrgtoDes.forEach(i->i.setBookstat("1"));
         inventoryRepository.save(updatedInventoryOrgtoDes);
 
+        logger.info("Go To getDefaultSeat ======> 10");
 
         int avaseat = propertySchedule.getSeatavailable();
         int remainingseat = (avaseat-noOfPassanger)>0?(avaseat-noOfPassanger):0;
